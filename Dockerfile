@@ -10,8 +10,13 @@ RUN apk --no-cache add ca-certificates
 RUN apk add --no-cache bash
 RUN apk add --no-cache git
 RUN apk add --no-cache curl
-RUN apk add --no-cache python3 py3-pip && \
-    pip3 install semgrep
+RUN apk add --no-cache python3 py3-pip py3-virtualenv \
+    && python3 -m venv /venv \
+    && . /venv/bin/activate \
+    && pip install --upgrade pip \
+    && pip install semgrep
+# (Opsional) Tambahkan path virtualenv ke PATH
+ENV PATH="/venv/bin:$PATH"
 WORKDIR /root/
 COPY --from=builder /sast-integrator ./
 #COPY --from=builder /sca-integrator/_public_key.pem ./

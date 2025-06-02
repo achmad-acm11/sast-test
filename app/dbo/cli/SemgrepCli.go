@@ -20,7 +20,7 @@ func NewSemgrepCli() *SemgrepCli {
 }
 
 func (t *SemgrepCli) Init() *SemgrepCli {
-	t.command = "semgrep scan --config=p/default --json"
+	t.command = "semgrep scan --config=p/default --sarif"
 	return t
 }
 
