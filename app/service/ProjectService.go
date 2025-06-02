@@ -47,7 +47,7 @@ func NewProjectService(repo repository.ProjectRepository,
 	repoResult repository.ResultRepository,
 	semgrepCli *cli.SemgrepCli,
 	gitCliService GitCliService,
-//asocApi *api.AsocAPI,
+	//asocApi *api.AsocAPI,
 	validate *validator.Validate,
 	db *gorm.DB) *ProjectServiceImpl {
 
