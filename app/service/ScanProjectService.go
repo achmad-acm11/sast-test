@@ -10,6 +10,7 @@ import (
 	"sast-integration/app/dto"
 	"sast-integration/app/dto/request"
 	"sast-integration/app/helper"
+	"strings"
 )
 
 type projectPathInfo struct {
@@ -23,7 +24,7 @@ func (p ProjectServiceImpl) scanningRepository(ctx *gin.Context, project entity.
 
 	pathData := p.preparingProjectPath(ctx, project)
 	p.prepareRunScanAndAction(ctx, project, pathData)
-	//p.saveResultToDb(ctx, project, pathData)
+	p.saveResultToDb(ctx, project, pathData)
 
 	p.stdLog.InfoFunction(fmt.Sprintf("END SCANNING REPOSITORY %s", project.Key))
 }
@@ -109,19 +110,25 @@ func (p ProjectServiceImpl) saveResultToDb(ctx *gin.Context, project entity.Proj
 	issues := []request.IssueRequest{}
 	for _, result := range results {
 		issues = append(issues, request.IssueRequest{
-			Type:        "",
-			Title:       result.Title,
-			Description: result.Description,
-			Severity:    result.Severity,
+			Title:        result.Title,
+			Rule:         result.Rule,
+			Path:         result.Path,
+			Line:         result.Line,
+			Type:         result.Type,
+			Description:  result.Description,
+			Severity:     result.Severity,
+			References:   result.References,
+			LastFoundAt:  result.LastFoundAt,
+			StatusResult: result.StatusResult,
 		})
 	}
 
-	//p.asocApi.SendResult(request.AsocSendResultRequest{
-	//	ProjectKey:  project.Key,
-	//	ScanVersion: scanVersion,
-	//	CreatedAt:   "",
-	//	Issues:      issues,
-	//})
+	p.asocApi.SendResult(request.AsocSendResultRequest{
+		ProjectKey:  project.Key,
+		ScanVersion: scanVersion,
+		CreatedAt:   "",
+		Issues:      issues,
+	})
 }
 
 func (p ProjectServiceImpl) incrementScanVersion(ctx *gin.Context, project entity.Project) int {
@@ -143,41 +150,39 @@ func (p ProjectServiceImpl) incrementScanVersion(ctx *gin.Context, project entit
 }
 
 func (p ProjectServiceImpl) mappingResultOutput(filePathResult string, projectId int, projectKey string) []entity.Result {
-	var data dto.ResultOutputFile
+	var dataJson dto.SemgrepResult
 
 	sourceFile, _ := os.Open(filePathResult)
 	defer sourceFile.Close()
 
 	byteValue1, _ := ioutil.ReadAll(sourceFile)
-	_ = json.Unmarshal(byteValue1, &data)
+	_ = json.Unmarshal(byteValue1, &dataJson)
 
 	results := []entity.Result{}
 
-	//for _, result := range data.Results {
-	//	for _, vulnerability := range result.Vulnerabilities {
-	//		tmpResult := new(entity.Result)
-	//		tmpResult.TargetFile = result.Target
-	//		tmpResult.PackagesType = result.Type
-	//		tmpResult.ProjectId = projectId
-	//		tmpResult.ProjectKey = projectKey
-	//		tmpResult.PrimaryUrl = vulnerability.PrimaryURL
-	//		tmpResult.Rule = vulnerability.VulnerabilityID
-	//		tmpResult.PackageName = vulnerability.PkgName
-	//		tmpResult.InstalledVersion = vulnerability.InstalledVersion
-	//		tmpResult.FixedVersion = vulnerability.FixedVersion
-	//		tmpResult.References = strings.Join(vulnerability.References, "|")
-	//		tmpResult.Title = vulnerability.Title
-	//		tmpResult.Description = vulnerability.Description
-	//		tmpResult.Severity = vulnerability.Severity
-	//		tmpResult.PublishedDate = vulnerability.PublishedDate
-	//		tmpResult.LastModifiedDate = vulnerability.LastModifiedDate
-	//		tmpResult.CvssSource = "nvd"
-	//		tmpResult.CvssV3 = fmt.Sprintf("%f", vulnerability.Cvss.Nvd.V3Score) + "|" + vulnerability.Cvss.Nvd.V3Vector
-	//		tmpResult.CvssV2 = fmt.Sprintf("%f", vulnerability.Cvss.Nvd.V3Score) + "|" + vulnerability.Cvss.Nvd.V2Vector
-	//
-	//		results = append(results, *tmpResult)
-	//	}
-	//}
+	for _, data := range dataJson.Results {
+		var rules []string
+		var titles []string
+		extra := data.Extra
+		metadata := extra.Metadata
+		for _, cwe := range data.Extra.Metadata.CWE {
+			split := strings.Split(cwe, ":")
+			rules = append(rules, strings.TrimSpace(split[0]))
+			titles = append(titles, strings.TrimSpace(split[1]))
+		}
+
+		tmpResult := new(entity.Result)
+		tmpResult.ProjectId = projectId
+		tmpResult.ProjectKey = projectKey
+		tmpResult.Rule = strings.Join(rules, "|")
+		tmpResult.References = strings.Join(metadata.References, "|")
+		tmpResult.Title = strings.Join(titles, "|")
+		tmpResult.Description = extra.Message
+		tmpResult.Severity = metadata.Impact
+		tmpResult.Type = metadata.Subcategory[0]
+
+		results = append(results, *tmpResult)
+	}
 	return results
 }
 

@@ -14,8 +14,14 @@ type AsocSendResultRequest struct {
 }
 
 type IssueRequest struct {
-	Type        string `json:"type"`
-	Title       string `json:"title"`
-	Description string `json:"description"`
-	Severity    string `json:"severity"`
+	Title        string `json:"title"`
+	Rule         string `json:"rule"`
+	Path         string `json:"path"`
+	Line         string `json:"line"`
+	Type         string `json:"type"`
+	Description  string `json:"description"`
+	Severity     string `json:"severity"`
+	References   string `json:"references"`
+	LastFoundAt  string `json:"last_found_at"`
+	StatusResult int    `json:"status_result"`
 }

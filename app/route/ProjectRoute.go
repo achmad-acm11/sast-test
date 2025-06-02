@@ -5,6 +5,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 	"sast-integration/app/controller"
+	"sast-integration/app/dbo/api"
 	"sast-integration/app/dbo/cli"
 	"sast-integration/app/dbo/repository"
 	"sast-integration/app/dbo/repository/project"
@@ -17,6 +18,7 @@ func ProjectRoute(router *gin.RouterGroup, db *gorm.DB, validate *validator.Vali
 	resultRepository := repository.NewResultRepository()
 	gitCli := cli.NewGitCli()
 	semgrepCli := cli.NewSemgrepCli()
+	asocApi := api.NewAsocAPI()
 
 	gitCliService := service.NewGitCliService(gitCli)
 	projectService := service.NewProjectService(projectRepository,
@@ -24,6 +26,7 @@ func ProjectRoute(router *gin.RouterGroup, db *gorm.DB, validate *validator.Vali
 		resultRepository,
 		semgrepCli,
 		gitCliService,
+		asocApi,
 		validate,
 		db)
 

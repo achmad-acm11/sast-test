@@ -47,7 +47,7 @@ func NewProjectService(repo repository.ProjectRepository,
 	repoResult repository.ResultRepository,
 	semgrepCli *cli.SemgrepCli,
 	gitCliService GitCliService,
-	//asocApi *api.AsocAPI,
+	asocApi *api.AsocAPI,
 	validate *validator.Validate,
 	db *gorm.DB) *ProjectServiceImpl {
 
@@ -121,11 +121,11 @@ func (p ProjectServiceImpl) CreateProjectData(ctx *gin.Context, req request.Crea
 		Token:      req.Token,
 	})
 
-	//p.asocApi.CreateProject(request.AsocProjectCreateRequest{
-	//	Key:         project.Key,
-	//	Name:        project.Name,
-	//	Description: project.Description,
-	//})
+	p.asocApi.CreateProject(request.AsocProjectCreateRequest{
+		Key:         project.Key,
+		Name:        project.Name,
+		Description: project.Description,
+	})
 	return response.NewProjectResponseBuilder().Default(project).Result()
 }
 
