@@ -8,6 +8,10 @@ services:
       - /var/lib/jenkins/deployment/.env
     ports:
       - '9095:9095'
+    volumes:
+      - "sast_integrator_data:/root/_project-repository/workspace:rw"
+      - "sast-integrator-service-result-files:/root/_scanned-project-files"
+      - "cache_data:/root/.cache/"
     environment:
         APP_ENV: "development"
         DB_HOST: 10.8.60.33
@@ -18,8 +22,14 @@ services:
         APP_PORT: "9095"
         ASOC_SERVICE_URL: "http://asoc-service:8080"
         SUPER_TOKEN: "eyJraWQiOiJwcml2YXRlX2tleSIsInR5cCI6IkpXVCIsImFsZyI6IlJTMjU2In0.eyJ1c2VyX3Blcm1pc3Npb25zIjpbIjMwNyIsIjMwMyIsIjMxMCIsIjMwNSIsIjQwMSIsIjEwMSIsIjQwMyIsIjIwMiIsIjMwNiIsIjMwOCIsIjMwMiIsIjMwMSIsIjMxMSIsIjEwMiIsIjIwMyIsIjMwNCIsIjMwOSIsIjIwMSIsIjQwMiIsIjUwMSIsIjUwMiIsIjUwMyIsIjUwNCIsIjYwMSIsIjYwMiIsIjYwMyIsIjYwNCJdLCJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJBZG1pbmlzdHJhdG9yIGFkbWluIiwiaXNzIjoiaWQuY28uaTMuZ2VuZXJhbHNlcnZpY2UiLCJ1c2VyX2xvZ2luIjoiYWRtaW4iLCJ1c2VyX3JvbGVzIjpbInN1cGVyYWRtaW4iXSwiaWF0IjoxNjYzMTUxMDgwfQ.ULf7jLUsY3OoODXDRDM3oYc7nW_trBSrmb3cP0Tbk0cpVn8r-VoKlY1wHeB6zE1rqrTaNNFqwkgtEhMQKLA76Yd-MOAvfNDOiDCZCR6brhLdwzlTaJKxpyTEtOL6yzlwOPGJIcN0p69EcNo11phrL6Z-nlRTajtReOBGo8t9_hZcZmvwg3ugmsgOVSxG4N3_Jf4ojxjEwz6TpyWZnaS1R33q5QCnCEfG5QCn9bBi-T-QrE-n_n1R704fAc-7Ho9hkbWJXHJ9uF6NdMW9H08YOyv5vCcWOShjy-ZUgG0csSjvRPZYJQo-OTSKxCA4xyqd0nX2Xy8m3f_nJnX7WR1m9Q"
+        PREFIX_PROJECT_FOLDER: "/_project-repository/workspace/"
+        PREFIX_RESULT_FOLDER: "/_scanned-project-files/"
     networks:
         - i3gis-net
 networks:
   i3gis-net:
     external: true
+volumes:
+  sast_integrator_data:
+  sast-integrator-service-result-files:
+  cache_data:
