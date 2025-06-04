@@ -8,4 +8,5 @@ import (
 func DoMigration(db *gorm.DB) {
 	db.AutoMigrate(&entity.Project{})
 	db.AutoMigrate(&entity.ProjectAuth{})
+	db.AutoMigrate(&entity.Result{})
 }

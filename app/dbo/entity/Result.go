@@ -11,7 +11,7 @@ type Result struct {
 	ProjectKey   string         `gorm:"column:project_key;type:varchar(255)"`
 	Rule         string         `gorm:"column:rule;type:varchar(255)"`
 	Path         string         `gorm:"column:path;type:varchar(255)"`
-	Line         string         `gorm:"column:line;type:varchar(255)"`
+	Line         int            `gorm:"column:line;type:varchar(255)"`
 	Title        string         `gorm:"column:title;type:text"`
 	Description  string         `gorm:"column:description;type:text"`
 	Severity     string         `gorm:"column:severity;type:varchar(255)"`

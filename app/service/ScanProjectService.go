@@ -8,7 +8,6 @@ import (
 	"os"
 	"sast-integration/app/dbo/entity"
 	"sast-integration/app/dto"
-	"sast-integration/app/dto/request"
 	"sast-integration/app/helper"
 	"strings"
 )
@@ -107,28 +106,28 @@ func (p ProjectServiceImpl) saveResultToDb(ctx *gin.Context, project entity.Proj
 	project.CurrentScanVersion = scanVersion
 	p.repo.Update(ctx, p.db, project)
 
-	issues := []request.IssueRequest{}
-	for _, result := range results {
-		issues = append(issues, request.IssueRequest{
-			Title:        result.Title,
-			Rule:         result.Rule,
-			Path:         result.Path,
-			Line:         result.Line,
-			Type:         result.Type,
-			Description:  result.Description,
-			Severity:     result.Severity,
-			References:   result.References,
-			LastFoundAt:  result.LastFoundAt,
-			StatusResult: result.StatusResult,
-		})
-	}
-
-	p.asocApi.SendResult(request.AsocSendResultRequest{
-		ProjectKey:  project.Key,
-		ScanVersion: scanVersion,
-		CreatedAt:   "",
-		Issues:      issues,
-	})
+	//issues := []request.IssueRequest{}
+	//for _, result := range results {
+	//	issues = append(issues, request.IssueRequest{
+	//		Title:        result.Title,
+	//		Rule:         result.Rule,
+	//		Path:         result.Path,
+	//		Line:         result.Line,
+	//		Type:         result.Type,
+	//		Description:  result.Description,
+	//		Severity:     result.Severity,
+	//		References:   result.References,
+	//		LastFoundAt:  result.LastFoundAt,
+	//		StatusResult: result.StatusResult,
+	//	})
+	//}
+	//
+	//p.asocApi.SendResult(request.AsocSendResultRequest{
+	//	ProjectKey:  project.Key,
+	//	ScanVersion: scanVersion,
+	//	CreatedAt:   "",
+	//	Issues:      issues,
+	//})
 }
 
 func (p ProjectServiceImpl) incrementScanVersion(ctx *gin.Context, project entity.Project) int {
@@ -175,6 +174,8 @@ func (p ProjectServiceImpl) mappingResultOutput(filePathResult string, projectId
 		tmpResult.ProjectId = projectId
 		tmpResult.ProjectKey = projectKey
 		tmpResult.Rule = strings.Join(rules, "|")
+		tmpResult.Path = data.Path
+		tmpResult.Line = data.Start.Line
 		tmpResult.References = strings.Join(metadata.References, "|")
 		tmpResult.Title = strings.Join(titles, "|")
 		tmpResult.Description = extra.Message

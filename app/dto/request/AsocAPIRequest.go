@@ -17,7 +17,7 @@ type IssueRequest struct {
 	Title        string `json:"title"`
 	Rule         string `json:"rule"`
 	Path         string `json:"path"`
-	Line         string `json:"line"`
+	Line         int    `json:"line"`
 	Type         string `json:"type"`
 	Description  string `json:"description"`
 	Severity     string `json:"severity"`
